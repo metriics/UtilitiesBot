@@ -4,15 +4,22 @@ from datetime import date
 import os
 import json
 
+# valorant api stuff (we use this to get current episode & act)
+import valorant
+from secret import key
+
 jsonLog = {}
 jsonLog['records'] = []
 logChannel = None
+episode = ""
+act = ""
 workingDir = "/home/pi/Utilities"
 token = ""
 with open(workingDir+"/token", 'r') as file:
     token = file.read().replace('\n', '')
 
 client = discord.Client()
+
 
 @client.event
 async def on_ready():
@@ -24,9 +31,17 @@ async def on_ready():
     else:
         print("No log channel set")
 
+    status = GetLastEpisodeAct()
+    if status == -1:
+        print("No log file found")
+    elif status == 0:
+        print("No logs in log file")
+    elif status == 1:
+        print("Got {0}, {1} from log file".format(episode, act))
+
 @client.event
 async def on_message(message):
-    global logChannel
+    global logChannel, episode, act
 
     if message.author == client.user:
         return
@@ -56,9 +71,12 @@ async def on_message(message):
                     wlText = "Wins: {0} | Losses: {1}\nRatio: {2}".format(wins, losses, ratio)
                     today = date.today().strftime("%B %d, %Y")
                     await logChannel.send("```{0}\n{1}```".format(today, wlText))
+                    await message.delete()
 
                     jsonLog['records'].append({
                         'date': today,
+                        'episode': episode,
+                        'act': act,
                         'wins': wins,
                         'losses': losses
                     })
@@ -97,10 +115,26 @@ async def on_message(message):
                         ClearJsonData(False)
                         await message.channel.send("**Cleared log file**")
 
+            elif command.startswith('setEpisode'):
+                args = command.split(' ')
+                if len(args) > 1:
+                    episode = "Episode " + args[1]
+                    await message.channel.send("**Set to:** {}".format(episode))
+                else:
+                    await message.channel.send("**Incorrect amount of arguments**")
+            
+            elif command.startswith('setAct'):
+                args = command.split(' ')
+                if len(args) > 1:
+                    act = "Act " + args[1]
+                    await message.channel.send("**Set to:** {}".format(act))
+                else:
+                    await message.channel.send("**Incorrect amount of arguments**")
+
+
 
 def GetLogChannel():
-    global logChannel
-    global workingDir
+    global logChannel, workingDir
 
     try:
         with open(workingDir + "/logChannel", 'r') as file:
@@ -181,5 +215,22 @@ def ClearJsonData(includeCurrent):
             return True
         else:
             return False
+
+def GetLastEpisodeAct():
+    global jsonLog, episode, act
+
+    try:
+        with open(workingDir + "/log.txt") as json_file:
+            jsonLog = json.load(json_file)
+            if len(jsonLog['records']) > 0:
+                episode = jsonLog['records'][len(jsonLog['records']-1)]['episode']
+                act = jsonLog['records'][len(jsonLog['records']-1)]['act']
+                return 1
+            else:
+                return 0
+    except FileNotFoundError:
+        print("File not found")
+        return -1
+
 
 client.run(token)

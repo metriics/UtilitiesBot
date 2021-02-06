@@ -4,3 +4,5 @@ token
 logChannel
 
 log.txt
+
+__pycache__/
