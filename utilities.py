@@ -79,16 +79,63 @@ async def on_message(message):
                     })
                     AppendJsonData()
 
-            elif command == "ratio":
+            elif command.startswith("ratio"):
+                args = command.split(" ")
+
+                # figure out what we are looking for. Total, episode x or episode x act y.
+                lookingFor = []
+                if len(args) == 2: # episode x ratio
+                    lookingFor[0] = "Episode {}".format(args[1])
+                elif len(args) == 3: # episode x act y ratio
+                    lookingFor[0] = "Episode {}".format(args[1])
+                    lookingFor[1] = "Act {}".format(args[2])
+
                 if GetJsonData() == 1:
-                    print(jsonLog)
-                    wins = 0
-                    losses = 0
-                    for record in jsonLog['records']:
-                        wins += int(record['wins'])
-                        losses += int(record['losses'])
-                    ratio = wins/losses
-                    await message.channel.send("**Total W/L ratio:** {}".format(ratio))
+                    if len(lookingFor) == 0: # total ratio
+                        wins = 0
+                        losses = 0
+                        for record in jsonLog['records']:
+                            wins += int(record['wins'])
+                            losses += int(record['losses'])
+                        if losses == 0:
+                            losses = 1 # dont divide by zero
+                        ratio = wins/losses
+                        await message.channel.send("**Total W/L ratio:** {}".format(ratio))
+                    elif len(lookingFor) == 1: # episode x ratio
+                        matchingGames = 0
+                        wins = 0
+                        losses = 0
+                        for record in jsonLog['records']:
+                            if record['episode'] == lookingFor[0]:
+                                wins += int(record['wins'])
+                                losses += int(record['losses'])
+                                matchingGames += 1
+
+                        if matchingGames > 0:
+                            if losses == 0:
+                                losses = 1 # dont divide by zero
+                            ratio = wins/losses
+                            await message.channel.send("**{0} W/L ratio:** {1}".format(lookingFor[0], ratio))
+                        else:
+                            await message.channel.send("**No games found in:** {0}".format(lookingFor[0]))
+                    elif len(lookingFor) == 2: # episode x act y ratio
+                        matchingGames = 0
+                        wins = 0
+                        losses = 0
+                        for record in jsonLog['records']:
+                            if record['episode'] == lookingFor[0]:
+                                if record['act'] == lookingFor[1]:
+                                    wins += int(record['wins'])
+                                    losses += int(record['losses'])
+                                    matchingGames += 1
+
+                        if matchingGames > 0:
+                            if losses == 0:
+                                losses = 1 # dont divide by zero
+                            ratio = wins/losses
+                            await message.channel.send("**{0} {1} W/L ratio:** {2}".format(lookingFor[0], lookingFor[1], ratio))
+                        else:
+                            await message.channel.send("**No games found in:** {0} {1}".format(lookingFor[0], lookingFor[1]))
 
                 else:
                     await message.channel.send("**No logs exist**")
