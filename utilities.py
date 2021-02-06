@@ -267,8 +267,8 @@ def GetLastEpisodeAct():
         with open(workingDir + "/log.txt") as json_file:
             jsonLog = json.load(json_file)
             if len(jsonLog['records']) > 0:
-                episode = jsonLog['records'][len(jsonLog['records']-1)]['episode']
-                act = jsonLog['records'][len(jsonLog['records']-1)]['act']
+                episode = jsonLog['records'][len(jsonLog['records'])-1]['episode']
+                act = jsonLog['records'][len(jsonLog['records'])-1]['act']
                 return 1
             else:
                 return 0
