@@ -51,7 +51,8 @@ async def on_message(message):
 
             elif command.startswith("help"):
                 finalMessage = "```**Utilities help:** [] denotes a command argument\n**!setLogChannel** - run this command in the channel you wish the logs to be written to.\n**!log [] []** - run anywhere. pass wins and losses as arguments. command message will be deleted for cleanliness.\n**!ratio [] []** - run anywhere. arguments are optional, none will find total W/L ratio, 1 will find ratio for that episode, and 2 will find it for that episode and that act.\n**!setEpisode []** - sets the episode to the argument.\n**!setAct []** - sets the act to the argument.```"
-            
+                await message.channel.send(finalMessage)
+
             elif command == "setLogChannel":
                 SetLogChannel(str(message.channel.name))
                 print("Log channel set to: {}".format(logChannel))
