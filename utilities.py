@@ -84,12 +84,11 @@ async def on_message(message):
 
                 # figure out what we are looking for. Total, episode x or episode x act y.
                 lookingFor = []
-                print(args)
-                if len(args) > 2: # episode x act y ratio
-                    lookingFor[0] = "Episode {}".format(args[1])
-                    lookingFor[1] = "Act {}".format(args[2])
-                elif len(args) > 1: # episode x ratio
-                    lookingFor[0] = "Episode {}".format(args[1])
+                if len(args) == 2: # episode x ratio
+                    lookingFor.append("Episode {}".format(args[1]))
+                elif len(args) == 3: # episode x act y ratio
+                    lookingFor.append("Episode {}".format(args[1]))
+                    lookingFor.append("Act {}".format(args[2]))
 
                 if GetJsonData() == 1:
                     if len(lookingFor) == 0: # total ratio
