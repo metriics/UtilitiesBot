@@ -4,9 +4,6 @@ from datetime import date
 import os
 import json
 
-# valorant api stuff (we use this to get current episode & act)
-import valorant
-from secret import key
 
 jsonLog = {}
 jsonLog['records'] = []
