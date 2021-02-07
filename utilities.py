@@ -66,27 +66,50 @@ async def on_message(message):
                         logChannel = discord.utils.get(message.guild.channels, name=logChannel)
                     
                     numbersToLog = command.split(' ')
-                    wins = int(numbersToLog[1])
-                    losses = int(numbersToLog[2])
-                    draws = numbersToLog[3]
-                    if losses == 0:
-                        ratio = wins
-                    else:
-                        ratio = wins/losses
-                    wlText = "Wins: {0} | Losses: {1} | Draws: {2}\nRatio: {3}".format(wins, losses, draws, ratio)
-                    today = date.today().strftime("%B %d, %Y")
-                    await logChannel.send("```{0}\n{1}```".format(today, wlText))
-                    await message.delete()
+                    if len(numbersToLog) == 4: # user specified draws as well
+                        wins = int(numbersToLog[1])
+                        losses = int(numbersToLog[2])
+                        draws = numbersToLog[3]
+                        if losses == 0:
+                            ratio = wins
+                        else:
+                            ratio = wins/losses
+                        wlText = "Wins: {0} | Losses: {1} | Draws: {2}\nRatio: {3}".format(wins, losses, draws, ratio)
+                        today = date.today().strftime("%B %d, %Y")
+                        await logChannel.send("```{0}\n{1}```".format(today, wlText))
+                        await message.delete()
 
-                    jsonLog['records'].append({
-                        'date': today,
-                        'episode': episode,
-                        'act': act,
-                        'wins': wins,
-                        'losses': losses,
-                        'draws': draws
-                    })
-                    AppendJsonData()
+                        jsonLog['records'].append({
+                            'date': today,
+                            'episode': episode,
+                            'act': act,
+                            'wins': wins,
+                            'losses': losses,
+                            'draws': draws
+                        })
+                        AppendJsonData()
+                    elif len(numbersToLog) == 3: #user only specified w/l, draws = 0
+                        wins = int(numbersToLog[1])
+                        losses = int(numbersToLog[2])
+                        draws = 0
+                        if losses == 0:
+                            ratio = wins
+                        else:
+                            ratio = wins/losses
+                        wlText = "Wins: {0} | Losses: {1} | Draws: {2}\nRatio: {3}".format(wins, losses, draws, ratio)
+                        today = date.today().strftime("%B %d, %Y")
+                        await logChannel.send("```{0}\n{1}```".format(today, wlText))
+                        await message.delete()
+
+                        jsonLog['records'].append({
+                            'date': today,
+                            'episode': episode,
+                            'act': act,
+                            'wins': wins,
+                            'losses': losses,
+                            'draws': draws
+                        })
+                        AppendJsonData()
 
             elif command.startswith("ratio"):
                 args = command.split(" ")
