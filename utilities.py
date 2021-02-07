@@ -50,7 +50,7 @@ async def on_message(message):
                 await client.close()
 
             elif command.startswith("help"):
-                finalMessage = "```Utilities help: [] denotes a command argument\n\n!setLogChannel - run this command in the channel you wish the logs to be written to.\n!log [] [] - run anywhere. pass wins and losses as arguments. command message will be deleted for cleanliness.\n!ratio [] [] - run anywhere. arguments are optional, none will find total W/L ratio, 1 will find ratio for that episode, and 2 will find it for that episode and that act.\n!setEpisode [] - sets the episode to the argument.\n!setAct [] - sets the act to the argument.```"
+                finalMessage = "```Utilities help: [] denotes a command argument\n\n!setLogChannel - run this command in the channel you wish the logs to be written to.\n!log [] [] [] - run anywhere. pass wins, losses and draws as arguments. command message will be deleted for cleanliness.\n!ratio [] [] - run anywhere. arguments are optional, none will find total W/L ratio, 1 will find ratio for that episode, and 2 will find it for that episode and that act.\n!setEpisode [] - sets the episode to the argument.\n!setAct [] - sets the act to the argument.```"
                 await message.channel.send(finalMessage)
 
             elif command == "setLogChannel":
@@ -66,10 +66,14 @@ async def on_message(message):
                         logChannel = discord.utils.get(message.guild.channels, name=logChannel)
                     
                     numbersToLog = command.split(' ')
-                    wins = numbersToLog[1]
-                    losses = numbersToLog[2]
-                    ratio = int(numbersToLog[1])/int(numbersToLog[2])
-                    wlText = "Wins: {0} | Losses: {1}\nRatio: {2}".format(wins, losses, ratio)
+                    wins = int(numbersToLog[1])
+                    losses = int(numbersToLog[2])
+                    draws = numbersToLog[3]
+                    if losses == 0:
+                        ratio = wins
+                    else:
+                        ratio = wins/losses
+                    wlText = "Wins: {0} | Losses: {1} | Draws: {2}\nRatio: {3}".format(wins, losses, draws, ratio)
                     today = date.today().strftime("%B %d, %Y")
                     await logChannel.send("```{0}\n{1}```".format(today, wlText))
                     await message.delete()
@@ -79,7 +83,8 @@ async def on_message(message):
                         'episode': episode,
                         'act': act,
                         'wins': wins,
-                        'losses': losses
+                        'losses': losses,
+                        'draws': draws
                     })
                     AppendJsonData()
 
@@ -179,6 +184,27 @@ async def on_message(message):
                 else:
                     await message.channel.send("**Incorrect amount of arguments**")
 
+            elif command.startswith('getDay'):
+                args = command.split(' ')
+                if len(args) == 4:
+                    dateStr = "{0} {1} {2}".format(args[1], args[2], args[3])
+                    if GetJsonData() == 1:
+                        for record in jsonLog['records']:
+                            if record['date'] == dateStr:
+                                wins = int(record['wins'])
+                                losses = int(record['losses'])
+
+                                if losses == 0:
+                                    ratio = wins
+                                else:
+                                    ratio = wins/losses
+                                
+                                wlText = "Wins: {0} | Losses: {1} | Draws: {2}\nRatio: {3}".format(record['wins'], record['losses'], record['draws'], ratio)
+                                await message.channel.send("```{0}\n{1}```".format(dateStr, wlText))
+                    else:
+                        await message.channel.send("**Failed to read JSON log**")
+                else:
+                    await message.channel.send("**Incorrect amount of arguments**")
 
 
 def GetLogChannel():
