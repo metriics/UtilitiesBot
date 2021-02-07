@@ -4,6 +4,10 @@ from datetime import date
 import os
 import json
 
+# TODO: something with AppendJsonData is wrong, we are getting duplicates and then an empty list.
+# This is probably due to a logic error. Do a refactor and some clean up to make it easier to read 
+# and spot the logic flaw.
+
 
 jsonLog = {}
 jsonLog['records'] = []
