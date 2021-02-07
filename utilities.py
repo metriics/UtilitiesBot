@@ -235,8 +235,7 @@ async def on_message(message):
 
                 if GetJsonData() == 1:
                     del jsonLog['records'][-1]
-                    messages = logChannel.history(limit=5, oldest_first=False)
-                    for msg in messages:
+                    async for msg in logChannel.history(limit=5, oldest_first=False):
                         if msg.author == client.user:
                             await msg.delete()
                             await message.delete()
