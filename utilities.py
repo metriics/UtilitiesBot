@@ -292,6 +292,7 @@ def GetJsonData():
     try:
         with open(workingDir + "/log.txt") as json_file:
             jsonLog = json.load(json_file)
+            print(jsonLog)
             return 1
     except FileNotFoundError:
         print("File not found")
