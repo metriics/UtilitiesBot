@@ -229,6 +229,23 @@ async def on_message(message):
                 else:
                     await message.channel.send("**Incorrect amount of arguments**")
 
+            elif command.startswith("undo"):
+                global logChannel
+                if isinstance(logChannel, str):
+                        logChannel = discord.utils.get(message.guild.channels, name=logChannel)
+
+                if GetJsonData() == 1:
+                    del jsonLog[-1]
+                    messages = logChannel.history(limit=5, oldest_first=False)
+                    for msg in messages:
+                        if msg.author == client.user:
+                            await msg.delete()
+                            await message.delete()
+                            break
+                    AppendJsonData()
+                else:
+                    await message.channel.send("**Failed to read JSON log**")
+
 
 def GetLogChannel():
     global logChannel, workingDir
