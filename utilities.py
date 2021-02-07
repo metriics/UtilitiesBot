@@ -243,6 +243,7 @@ async def on_message(message):
                 jsonLog['records'] = []
 
                 if GetJsonData() == 1:
+                    print(jsonLog)
                     del jsonLog['records'][-1]
                     async for msg in logChannel.history(limit=5, oldest_first=False):
                         if msg.author == client.user:
