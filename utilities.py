@@ -79,6 +79,9 @@ async def on_message(message):
                         await logChannel.send("```{0}\n{1}```".format(today, wlText))
                         await message.delete()
 
+                        jsonLog = {}
+                        jsonLog['records'] = []
+
                         jsonLog['records'].append({
                             'date': today,
                             'episode': episode,
@@ -100,6 +103,9 @@ async def on_message(message):
                         today = date.today().strftime("%B %d, %Y")
                         await logChannel.send("```{0}\n{1}```".format(today, wlText))
                         await message.delete()
+
+                        jsonLog = {}
+                        jsonLog['records'] = []
 
                         jsonLog['records'].append({
                             'date': today,
@@ -232,6 +238,9 @@ async def on_message(message):
             elif command.startswith("undo"):
                 if isinstance(logChannel, str):
                         logChannel = discord.utils.get(message.guild.channels, name=logChannel)
+
+                jsonLog = {}
+                jsonLog['records'] = []
 
                 if GetJsonData() == 1:
                     del jsonLog['records'][-1]
