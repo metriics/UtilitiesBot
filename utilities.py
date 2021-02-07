@@ -234,7 +234,7 @@ async def on_message(message):
                         logChannel = discord.utils.get(message.guild.channels, name=logChannel)
 
                 if GetJsonData() == 1:
-                    del jsonLog[-1]
+                    del jsonLog['records'][-1]
                     messages = logChannel.history(limit=5, oldest_first=False)
                     for msg in messages:
                         if msg.author == client.user:
