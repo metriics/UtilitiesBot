@@ -230,7 +230,6 @@ async def on_message(message):
                     await message.channel.send("**Incorrect amount of arguments**")
 
             elif command.startswith("undo"):
-                global logChannel
                 if isinstance(logChannel, str):
                         logChannel = discord.utils.get(message.guild.channels, name=logChannel)
 
